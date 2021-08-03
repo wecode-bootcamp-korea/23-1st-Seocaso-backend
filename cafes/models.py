@@ -2,10 +2,10 @@ from django.db                 import models
 from django.db.models.deletion import CASCADE
 
 class Cafe(models.Model):
-    name           = models.CharField(max_length=100)
+    name           = models.CharField(max_length=20)
     address        = models.CharField(max_length=200)
-    hours          = models.CharField(max_length=100)
-    phone_number   = models.CharField(max_length=45)
+    business_hours = models.CharField(max_length=100)
+    phone_number   = models.CharField(max_length=20)
     description    = models.CharField(max_length=500)
     main_image_url = models.URLField(max_length=1000)
 
