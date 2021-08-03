@@ -8,7 +8,7 @@ django.setup()
 
 from cafes.models import Cafe, Menu
 
-CSV_PATH_CAFES = './menus.csv'
+CSV_PATH_CAFES = 'menus.csv'
 
 with open(CSV_PATH_CAFES) as in_file:
     data_reader = csv.reader(in_file)
