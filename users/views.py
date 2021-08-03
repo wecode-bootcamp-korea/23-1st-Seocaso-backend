@@ -19,7 +19,7 @@ class SignupView(View):
             email_type    = re.compile('[a-z0-9-_.]+@[a-z]+\.[a-z]')
             password_type = re.compile('(?=.{10,})(?=.*[a-zA-Z!@#$%^&*()_+~])(?=.*[!@#$%^&*()_+~0-9]).*')
 
-            if not name_type.match(data['name']):
+            if not name_type.match(data['nickname']):
                 return JsonResponse({'message':'NAME_FORMAT_ERROR'}, status=401)
 
             if not email_type.match(data['email']):
@@ -33,7 +33,7 @@ class SignupView(View):
             ).decode()
 
             User.objects.create(
-                name     = data['name'],
+                nickname = data['nickname'],
                 email    = data['email'],
                 password = hashed_password
             )
