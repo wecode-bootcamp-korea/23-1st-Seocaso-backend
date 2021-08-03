@@ -27,5 +27,3 @@ class CafeImage(models.Model):
 
     class Meta:
         db_table = 'cafe_images'
-
-
