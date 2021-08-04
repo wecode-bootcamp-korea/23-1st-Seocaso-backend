@@ -1,3 +1,46 @@
-from django.shortcuts import render
+import json
+from json.decoder import JSONDecodeError
+from users.models import User
 
-# Create your views here.
+from django.http.response import JsonResponse
+from django.views import View
+
+from reviews.models import Review
+from cafes.models import Cafe
+from utils import LoginConfirm
+
+class ReviewView(View):
+    @LoginConfirm
+    def post(self, request, cafe_id):
+        try:
+            if not Cafe.objects.filter(id=cafe_id).exists():
+                return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'}, status=400)
+
+            data = json.loads(request.body)
+            cafe = Cafe.objects.get(id=cafe_id)
+            content = data['content']
+
+            if not content:
+                return JsonResponse({'MESSAGE' : 'EMPTY_CONTENT'}, status=400)
+
+            Review.objects.create(
+                user = request.user,
+                cafe = cafe,
+                content = content
+            )
+
+            return JsonResponse({'MESSAGE' : 'REVIEW_CREATED'}, status=200)
+
+        except KeyError:
+            return  JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status=400)
+
+        except JSONDecodeError:
+            return JsonResponse({'MESSAGE' : 'JSON_DECODE_ERROR'}, status=400)
+
+    @LoginConfirm
+    def delete(self, request, cafe_id):
+        if not Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).exists():
+            return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
+
+        Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).delete()
+        return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=200)
