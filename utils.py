@@ -5,7 +5,7 @@ from django.http  import JsonResponse
 from users.models import User
 from my_settings  import SECRET_KEY, ALGORITHM
 
-def LoginConfirm(func):
+def LoginConfirm(user_action):
     def wrapper(self, request, *args, **kwargs):
         user_token = request.headers.get('Authorization')
         header     = jwt.decode(user_token, SECRET_KEY, ALGORITHM)
@@ -15,6 +15,6 @@ def LoginConfirm(func):
 
         request.user = User.objects.get(id=header['id'])
 
-        return func(self, request, *args, **kwargs)
+        return user_action(self, request, *args, **kwargs)
 
     return wrapper
