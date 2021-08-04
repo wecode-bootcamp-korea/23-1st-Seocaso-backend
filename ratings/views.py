@@ -11,20 +11,29 @@ from utils          import LoginConfirm
 
 class StarRatingView(View):
     @LoginConfirm
-    def post(self, request):
+    def post(self, request, cafe_id):
         try:
             data = json.loads(request.body)
 
-            user = User.objects.get(id=data['user'])
+            user = User.objects.get(id=request.user.id)
 
-            if not Cafe.objects.filter(id=data['cafe']).exists():
+            if not Cafe.objects.filter(id=cafe_id).exists():
                 return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=401)
             else:
-                cafe = Cafe.objects.get(id=data['cafe'])
+                cafe = Cafe.objects.get(id=cafe_id)
 
-            if StarRating.objects.filter(user_id=data['user'], cafe_id=data['cafe']).exists():
-                duplicate_star = StarRating.objects.filter(user_id=data['user'], cafe_id=data['cafe'])
-                duplicate_star.update(score=data['score'])
+            if (StarRating.objects.filter(user_id=request.user.id, cafe_id=cafe_id).exists()):
+                
+                if StarRating.objects.filter(
+                    user_id=request.user.id, cafe_id=cafe_id, score=data['score']
+                    ).exists():
+                    StarRating.objects.filter(
+                        user_id=request.user.id, cafe_id=cafe_id, score=data['score']
+                        ).delete()
+                
+                else:
+                    duplicate_star = StarRating.objects.filter(user_id=request.user.id, cafe_id=cafe_id)
+                    duplicate_star.update(score=data['score'])
                 
             else:    
                 StarRating.objects.create(
@@ -40,12 +49,12 @@ class StarRatingView(View):
         except JSONDecodeError:
             return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status=400)
     
-    def get(self, request):
+    def get(self, request, cafe_id):
         
-        star_ratings = StarRating.objects.all()
-
+        star_ratings = StarRating.objects.filter(cafe_id=cafe_id)
+        
         results = []
-
+        
         for star_rating in star_ratings:
             results.append(
                 {
@@ -54,4 +63,5 @@ class StarRatingView(View):
                     'user' : star_rating.user_id
                 }
             )
+
         return JsonResponse({'result':results}, status=200)
