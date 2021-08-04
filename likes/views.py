@@ -29,7 +29,7 @@ class ReviewLikeView(View):
         if not Review.objects.filter(id=review_id):
             return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
 
-        if not ReviewLike.objects.filter(id=review_id, user_id=request.user.id):
+        if not ReviewLike.objects.filter(review_id=review_id, user_id=request.user.id):
             ReviewLike.objects.create(
                 user   = request.user,
                 review = Review.objects.get(id=review_id)
@@ -37,6 +37,6 @@ class ReviewLikeView(View):
             return JsonResponse({'MESSAGE' : 'LIKE_CREATED'}, status=200)
 
         else:
-            ReviewLike.objects.filter(id=review_id, user_id=request.user.id).delete()
+            ReviewLike.objects.filter(review_id=review_id, user_id=request.user.id).delete()
             return JsonResponse({'MESSAGE' : 'LIKE_DELETED'}, status=200)
     
