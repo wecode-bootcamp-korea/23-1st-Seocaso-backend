@@ -49,4 +49,5 @@ class ReviewView(View):
 
         Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).delete()
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=200)
+
         
