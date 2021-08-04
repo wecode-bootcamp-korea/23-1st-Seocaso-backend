@@ -13,10 +13,10 @@ class ReviewView(View):
     @LoginConfirm
     def post(self, request, cafe_id):
         try:
-            if not Cafe.objects.filter(id=cafe_id).exists():
+            if not Cafe.objects.filter(id=cafe_id):
                 return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'}, status=400)
 
-            if Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).exists():
+            if Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id):
                 return JsonResponse({'MESSAGE' : 'REVIEW_ALREADY_EXIST'})
 
             data    = json.loads(request.body)
@@ -41,10 +41,10 @@ class ReviewView(View):
 
     @LoginConfirm
     def delete(self, request, cafe_id):
-        if not Review.objects.filter(cafe_id=cafe_id).exists():
+        if not Review.objects.filter(cafe_id=cafe_id):
             return JsonResponse({'MESSAGE' : 'CAFE_DOSE_NOT_EXIST'}, status=400)
 
-        if not Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).exists():
+        if not Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id):
             return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
 
         Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).delete()
