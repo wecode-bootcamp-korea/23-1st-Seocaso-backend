@@ -49,7 +49,7 @@ class SigninView(View):
             data     = json.loads(request.body)
             email    = data['email']
             password = data['password']
-            
+
             user     = User.objects.get(email=email)
 
             if not User.objects.filter(email=email).exists():
@@ -69,3 +69,6 @@ class SigninView(View):
 
         except User.DoesNotExist:
             return JsonResponse({'MESSAGE' : 'USER_DOES_NOT_EXIST'}, status=400)
+        
+        except User.MultipleObjectsReturned:
+            return JsonResponse({'MESSAGE' : 'MULTIPLE_OBJECTS_RETURNED'}, status=400)
