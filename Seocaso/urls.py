@@ -17,5 +17,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('users', include('users.urls')),
-    path('cafes', include('ratings.urls')),
+    path('cafe', include('ratings.urls')),
 ]
