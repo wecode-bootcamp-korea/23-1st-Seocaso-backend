@@ -1,16 +1,16 @@
 import json
 from json.decoder import JSONDecodeError
-from users.models import User
 
 from django.http.response import JsonResponse
-from django.views import View
+from django.views         import View
 
 from reviews.models import Review
-from cafes.models import Cafe
-from utils import LoginConfirm
+from cafes.models   import Cafe
+from users.models   import User
+from utils          import log_in_confirm
 
 class ReviewView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, cafe_id):
         try:
             if not Cafe.objects.filter(id=cafe_id):
@@ -39,7 +39,7 @@ class ReviewView(View):
         except JSONDecodeError:
             return JsonResponse({'MESSAGE' : 'JSON_DECODE_ERROR'}, status=400)
 
-    @LoginConfirm
+    @log_in_confirm
     def delete(self, request, cafe_id):
         if not Review.objects.filter(cafe_id=cafe_id):
             return JsonResponse({'MESSAGE' : 'CAFE_DOSE_NOT_EXIST'}, status=400)
