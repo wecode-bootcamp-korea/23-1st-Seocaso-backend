@@ -1,11 +1,11 @@
 from json.encoder import JSONEncoder
+
 from django.http  import JsonResponse
 from django.views import View
 
 from cafes.models   import Cafe
 from likes.models   import CafeLike, ReviewLike
 from reviews.models import Review
-from users.models import User
 from utils          import log_in_confirm
 
 class CafeLikeView(View):
