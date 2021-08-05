@@ -7,14 +7,18 @@ from my_settings  import SECRET_KEY, ALGORITHM
 
 def log_in_confirm(func):
     def wrapper(self, request, *args, **kwargs):
-        user_token = request.headers.get('Authorization')
-        header     = jwt.decode(user_token, SECRET_KEY, algorithms=ALGORITHM)
+        try:
+            user_token = request.headers.get('Authorization')
+            header     = jwt.decode(user_token, SECRET_KEY, algorithms=ALGORITHM)
 
-        if not User.objects.filter(id=header['id']).exists():
-            return JsonResponse({'MESSAGE' : 'INVALID_USER'}, status=401)
+            if not User.objects.filter(id=header['id']):
+                return JsonResponse({'MESSAGE' : 'INVALID_USER'}, status=401)
 
-        request.user = User.objects.get(id=header['id'])
+            request.user = User.objects.get(id=header['id'])
 
-        return func(self, request, *args, **kwargs)
+            return func(self, request, *args, **kwargs)
+
+        except jwt.InvalidSignatureError:
+            return JsonResponse({'MESSAGE' : 'INVALID_SIGNATURE_ERROR'}, status=400)
 
     return wrapper
