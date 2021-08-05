@@ -65,7 +65,4 @@ class CommentOnReviewView(View):
         )
 
         return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
-    
-
-            
              
