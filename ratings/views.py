@@ -14,24 +14,26 @@ class StarRatingView(View):
     def post(self, request, cafe_id):
         try:
             data = json.loads(request.body)
-
+            
             user = request.user
-
+            
             if not Cafe.objects.filter(id=cafe_id).exists():
                 return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=401)
             
-            cafe = Cafe.objects.get(id=cafe_id)
+            star, flag = StarRating.objects.get_or_create(cafe_id=cafe_id, user_id=user.id)
 
-            if StarRating.objects.filter(user_id=user.id, cafe_id=cafe_id).exists():
-                
-                star, flag = StarRating.objects.get_or_create(score=data['score'], user_id=user.id, cafe_id=cafe_id)
-
-                if not flag:
+            if not flag:
+                if star.score == data['score']:
                     star.delete()
+                    return JsonResponse({'MESSAGE' : 'SCORE_DELETED'}, status=200)
+
                 else:
-                    return JsonResponse({'MESSAGE':'CREATED'}, status=201) 
-                
-            return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
+                    star.score = data['score']
+                    star.save()
+                    return JsonResponse({'MESSAGE' : 'SCORE_UPDATED'}, status=200)
+            else:
+                StarRating.objects.filter(cafe_id=cafe_id, user_id=user.id).update(score=data['score'])
+                return JsonResponse({'MESSAGE' : 'SCORE_CREATED'}, status=200)
         
         except KeyError:
             return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
