@@ -9,10 +9,10 @@ from utils          import log_in_confirm
 class CafeLikeView(View):
     @log_in_confirm
     def post(self, request, cafe_id):
-        if not Cafe.objects.filter(id=cafe_id):
+        if not Cafe.objects.filter(id=cafe_id).exists():
             return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'})
 
-        if not CafeLike.objects.filter(cafe_id=cafe_id, user_id=request.user.id):
+        if not CafeLike.objects.filter(cafe_id=cafe_id, user_id=request.user.id).exists():
             CafeLike.objects.create(
                 user = request.user,
                 cafe = Cafe.objects.get(id=cafe_id)
@@ -26,10 +26,10 @@ class CafeLikeView(View):
 class ReviewLikeView(View):
     @log_in_confirm
     def post(self, request, review_id):
-        if not Review.objects.filter(id=review_id):
+        if not Review.objects.filter(id=review_id).exists():
             return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
 
-        if not ReviewLike.objects.filter(review_id=review_id, user_id=request.user.id):
+        if not ReviewLike.objects.filter(review_id=review_id, user_id=request.user.id).exists():
             ReviewLike.objects.create(
                 user   = request.user,
                 review = Review.objects.get(id=review_id)
