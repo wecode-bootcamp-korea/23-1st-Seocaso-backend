@@ -15,32 +15,24 @@ class StarRatingView(View):
         try:
             data = json.loads(request.body)
 
-            user = User.objects.get(id=request.user.id)
+            user = request.user
 
             if not Cafe.objects.filter(id=cafe_id).exists():
                 return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=401)
-            else:
-                cafe = Cafe.objects.get(id=cafe_id)
+            
+            cafe = Cafe.objects.get(id=cafe_id)
 
-            if (StarRating.objects.filter(user_id=request.user.id, cafe_id=cafe_id).exists()):
+            if StarRating.objects.filter(user_id=user.id, cafe_id=cafe_id).exists():
                 
-                if StarRating.objects.filter(
-                    user_id=request.user.id, cafe_id=cafe_id, score=data['score']
-                    ).exists():
-                    StarRating.objects.filter(
-                        user_id=request.user.id, cafe_id=cafe_id, score=data['score']
-                        ).delete()
-                
+                star, flag = StarRating.objects.get_or_create(score=data['score'], user_id=user.id, cafe_id=cafe.id)
+
+                if not flag:
+                    star.delete()
+                if flag and (star.score != data['score']):
+                    star.score = data['score']
                 else:
-                    duplicate_star = StarRating.objects.filter(user_id=request.user.id, cafe_id=cafe_id)
-                    duplicate_star.update(score=data['score'])
+                    return JsonResponse({'MESSAGE':'CREATED'}, status=201) 
                 
-            else:    
-                StarRating.objects.create(
-                    score = data['score'],
-                    user  = user,
-                    cafe  = cafe
-                )
             return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
         
         except KeyError:
@@ -59,8 +51,8 @@ class StarRatingView(View):
             results.append(
                 {
                     'score': star_rating.score,
-                    'cafe' : star_rating.cafe_id,
-                    'user' : star_rating.user_id
+                    'cafe_id' : star_rating.cafe_id,
+                    'user_id' : star_rating.user_id
                 }
             )
 
