@@ -27,8 +27,8 @@ class ReviewView(View):
                 return JsonResponse({'MESSAGE' : 'EMPTY_CONTENT'}, status=400)
 
             Review.objects.create(
-                user = request.user,
-                cafe = cafe,
+                user    = request.user,
+                cafe    = cafe,
                 content = content
             )
             return JsonResponse({'MESSAGE' : 'REVIEW_CREATED'}, status=200)
