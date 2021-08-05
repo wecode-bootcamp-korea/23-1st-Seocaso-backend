@@ -6,10 +6,10 @@ from django.views         import View
 
 from reviews.models import Review
 from cafes.models   import Cafe
-from utils          import LoginConfirm
+from utils          import log_in_confirm
 
 class ReviewView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, cafe_id):
         try:
             if not Cafe.objects.filter(id=cafe_id):
@@ -37,8 +37,8 @@ class ReviewView(View):
 
         except JSONDecodeError:
             return JsonResponse({'MESSAGE' : 'JSON_DECODE_ERROR'}, status=400)
-
-    @LoginConfirm
+    
+    @log_in_confirm
     def delete(self, request, cafe_id):
         if not Review.objects.filter(cafe_id=cafe_id):
             return JsonResponse({'MESSAGE' : 'CAFE_DOSE_NOT_EXIST'}, status=400)
@@ -50,7 +50,7 @@ class ReviewView(View):
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=200)
 
 class CommentOnReviewView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, review_id):
         
         data = json.loads(request.body)
