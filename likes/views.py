@@ -4,10 +4,10 @@ from django.views import View
 from cafes.models   import Cafe
 from likes.models   import CafeLike, ReviewLike
 from reviews.models import Review
-from utils          import LoginConfirm
+from utils          import log_in_confirm
 
 class CafeLikeView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, cafe_id):
         if not Cafe.objects.filter(id=cafe_id):
             return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'})
@@ -24,7 +24,7 @@ class CafeLikeView(View):
             return JsonResponse({'MESSAGE' : 'LIKE_DELETED'}, status=200)
 
 class ReviewLikeView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, review_id):
         if not Review.objects.filter(id=review_id):
             return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
