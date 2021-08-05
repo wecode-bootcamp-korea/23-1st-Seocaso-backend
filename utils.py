@@ -11,7 +11,7 @@ def log_in_confirm(func):
             user_token = request.headers.get('Authorization')
             header     = jwt.decode(user_token, SECRET_KEY, algorithms=ALGORITHM)
 
-            if not User.objects.filter(id=header['id']):
+            if not User.objects.filter(id=header['id']).exists():
                 return JsonResponse({'MESSAGE' : 'INVALID_USER'}, status=401)
 
             request.user = User.objects.get(id=header['id'])
