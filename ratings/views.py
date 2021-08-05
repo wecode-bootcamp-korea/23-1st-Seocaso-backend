@@ -7,10 +7,10 @@ from django.views import View
 from ratings.models import StarRating
 from users.models   import User
 from cafes.models   import Cafe
-from utils          import LoginConfirm
+from utils          import log_in_confirm
 
 class StarRatingView(View):
-    @LoginConfirm
+    @log_in_confirm
     def post(self, request, cafe_id):
         try:
             data = json.loads(request.body)
@@ -24,12 +24,10 @@ class StarRatingView(View):
 
             if StarRating.objects.filter(user_id=user.id, cafe_id=cafe_id).exists():
                 
-                star, flag = StarRating.objects.get_or_create(score=data['score'], user_id=user.id, cafe_id=cafe.id)
+                star, flag = StarRating.objects.get_or_create(score=data['score'], user_id=user.id, cafe_id=cafe_id)
 
                 if not flag:
                     star.delete()
-                if flag and (star.score != data['score']):
-                    star.score = data['score']
                 else:
                     return JsonResponse({'MESSAGE':'CREATED'}, status=201) 
                 
