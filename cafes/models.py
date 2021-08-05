@@ -31,10 +31,10 @@ class CafeCollection(models.Model):
     user = models.ForeignKey('users.user', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'cafes_colloections'
+        db_table = 'cafe_colloections'
 
-class CafeList(models.Model):
-    cafe = models.ForeignKey('cafe', on_delete=models.CASCADE)
+class CollectionCafeList(models.Model):
+    cafe       = models.ForeignKey('cafe', on_delete=models.CASCADE)
     collection = models.ForeignKey('cafecollection', on_delete=models.CASCADE)
 
     class Meta:
