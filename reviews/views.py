@@ -6,7 +6,6 @@ from django.views         import View
 
 from reviews.models import Review
 from cafes.models   import Cafe
-from users.models   import User
 from utils          import log_in_confirm
 
 class ReviewView(View):
@@ -17,7 +16,7 @@ class ReviewView(View):
                 return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'}, status=400)
 
             if Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).exists():
-                return JsonResponse({'MESSAGE' : 'REVIEW_ALREADY_EXIST'})
+                return JsonResponse({'MESSAGE' : 'REVIEW_ALREADY_EXIST'}, status=400)
 
             data    = json.loads(request.body)
             cafe    = Cafe.objects.get(id=cafe_id)
@@ -31,7 +30,7 @@ class ReviewView(View):
                 cafe    = cafe,
                 content = content
             )
-            return JsonResponse({'MESSAGE' : 'REVIEW_CREATED'}, status=200)
+            return JsonResponse({'MESSAGE' : 'REVIEW_CREATED'}, status=201)
 
         except KeyError:
             return  JsonResponse({'MESSAGE' : 'KEY_ERROR'}, status=400)
@@ -48,6 +47,6 @@ class ReviewView(View):
             return JsonResponse({'MESSAGE' : 'REVIEW_DOES_NOT_EXIST'}, status=400)
 
         Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id).delete()
-        return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=200)
+        return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
 
         
