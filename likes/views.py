@@ -1,5 +1,3 @@
-from json.encoder import JSONEncoder
-
 from django.http  import JsonResponse
 from django.views import View
 
