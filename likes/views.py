@@ -19,6 +19,8 @@ class CafeLikeView(View):
         if not flag:
             like.delete()
             return JsonResponse({'MESSAGE' : 'LIKE_DELETED'}, status=204)
+        
+        return JsonResponse({'MESSAGE' : 'LIKE_CREATED'}, status=201)
 
 class ReviewLikeView(View):
     @log_in_confirm
@@ -32,6 +34,5 @@ class ReviewLikeView(View):
             like.delete()
             return JsonResponse({'MESSAGE' : 'LIKE_DELETED'}, status=204)
         
-        else:
-            return JsonResponse({'MESSAGE' : 'LIKE_CRAETED'}, status=201)
+        return JsonResponse({'MESSAGE' : 'LIKE_CRAETED'}, status=201)
     
