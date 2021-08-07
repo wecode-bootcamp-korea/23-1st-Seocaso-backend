@@ -1,0 +1,81 @@
+id,cafe_id,name,price,image_url
+1,1,카페라떼,4500,https://i.imgur.com/ehdfhcb.jpg
+2,1,카푸치노,4500,https://i.imgur.com/lTe8HBB.jpg
+3,1,에스프레소,4000,https://i.imgur.com/ZbyIWBD.jpg
+4,1,녹차라떼,4500,https://i.imgur.com/N3I2h2D.jpg
+5,2,아메리카노,4000,https://i.imgur.com/7X3eBxE.jpg
+6,2,토마토,3000,https://i.imgur.com/dw8vKdR.jpg
+7,2,바나나,3000,https://i.imgur.com/gfqeqxh.jpg
+8,3,바나나 라떼,4500,https://i.imgur.com/ZLf3Z3P.jpg
+9,3,카페라떼,4000,https://i.imgur.com/LitRgyi.jpg
+10,3,에스프레소,4000,https://i.imgur.com/YoFw4Yt.jpg
+11,3,녹차라떼,4000,https://i.imgur.com/GYOKhwb.jpg
+12,3,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+13,4,카페라떼,4000,https://i.imgur.com/ZTyBpPP.jpg
+14,4,녹차라떼,4000,https://i.imgur.com/VIXm0Na.jpg
+15,4,딸기 케이크,5000,https://i.imgur.com/9TJrUs1.jpg
+16,4,딸기 케이크,5000,https://i.imgur.com/J4vXXDu.jpg
+17,5,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+18,5,카페라떼,4000,https://i.imgur.com/ZTyBpPP.jpg
+19,5,에스프레소,4000,https://i.imgur.com/n7HWXhc.jpg
+20,5,치즈 케이크,6000,https://i.imgur.com/DgCBtL7.jpg
+21,6,카페라떼,5000,https://i.imgur.com/2l7L2Xy.jpg
+22,6,에스프레소,4000,https://i.imgur.com/n7HWXhc.jpg
+23,6,크림 무스,6000,https://i.imgur.com/xdER1TQ.jpg
+24,6,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+25,7,아메리카노,4000,https://i.imgur.com/lTYvNoL.jpg
+26,7,카페라떼,4000,https://i.imgur.com/LsqWKtx.jpg
+27,7,에스프레소,4000,https://i.imgur.com/1DmkVuW.jpg
+28,7,당근 케이크,6000,https://i.imgur.com/vHTKJml.jpg
+29,7,초콜릿 라떼,4500,https://i.imgur.com/2pGIxUM.jpg
+30,7,빙수,6000,https://i.imgur.com/pgkDUEW.jpg
+31,7,치즈 케이크,6000,https://i.imgur.com/pgkDUEW.jpg
+32,8,카페라떼,4500,https://i.imgur.com/ehdfhcb.jpg
+33,8,카푸치노,4500,https://i.imgur.com/lTe8HBB.jpg
+34,8,에스프레소,4000,https://i.imgur.com/ZbyIWBD.jpg
+35,8,녹차라떼,4500,https://i.imgur.com/N3I2h2D.jpg
+36,9,아메리카노,4000,https://i.imgur.com/7X3eBxE.jpg
+37,9,토마토,3000,https://i.imgur.com/dw8vKdR.jpg
+38,9,바나나,3000,https://i.imgur.com/gfqeqxh.jpg
+39,10,바나나 라떼,4500,https://i.imgur.com/ZLf3Z3P.jpg
+40,10,카페라떼,4000,https://i.imgur.com/LitRgyi.jpg
+41,10,에스프레소,4000,https://i.imgur.com/YoFw4Yt.jpg
+42,10,녹차라떼,4000,https://i.imgur.com/GYOKhwb.jpg
+43,10,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+44,11,카페라떼,4000,https://i.imgur.com/ZTyBpPP.jpg
+45,11,녹차라떼,4000,https://i.imgur.com/VIXm0Na.jpg
+46,11,딸기 케이크,5000,https://i.imgur.com/9TJrUs1.jpg
+47,11,딸기 케이크,5000,https://i.imgur.com/J4vXXDu.jpg
+48,12,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+49,12,카페라떼,4000,https://i.imgur.com/ZTyBpPP.jpg
+50,12,에스프레소,4000,https://i.imgur.com/n7HWXhc.jpg
+51,12,치즈 케이크,6000,https://i.imgur.com/DgCBtL7.jpg
+52,13,카페라떼,5000,https://i.imgur.com/2l7L2Xy.jpg
+53,13,에스프레소,4000,https://i.imgur.com/n7HWXhc.jpg
+54,13,크림 무스,6000,https://i.imgur.com/xdER1TQ.jpg
+55,13,아메리카노,4000,https://i.imgur.com/qAsURLy.jpg
+56,14,아메리카노,4000,https://i.imgur.com/lTYvNoL.jpg
+57,14,카페라떼,4000,https://i.imgur.com/LsqWKtx.jpg
+58,14,에스프레소,4000,https://i.imgur.com/1DmkVuW.jpg
+59,14,당근 케이크,6000,https://i.imgur.com/vHTKJml.jpg
+60,14,초콜릿 라떼,4500,https://i.imgur.com/2pGIxUM.jpg
+61,14,빙수,6000,https://i.imgur.com/pgkDUEW.jpg
+62,14,치즈 케이크,6000,https://i.imgur.com/pgkDUEW.jpg
+63,15,아메리카노,4000,https://i.imgur.com/jQATmnL.jpg
+64,15,카페라떼,4000,https://i.imgur.com/SlUQMIU.jpg
+65,15,녹차라떼,4000,https://i.imgur.com/Qf20hzD.jpg
+66,16,아메리카노,4000,https://i.imgur.com/j4oqYFW.jpg
+67,16,카페라떼,4000,https://i.imgur.com/YzeL6Fp.jpg
+68,16,당근 케이크,6000,https://i.imgur.com/vHTKJml.jpg
+69,17,초코 스콘,5000,https://i.imgur.com/0zRrOll.jpg
+70,17,아메리카노,4000,https://i.imgur.com/qMKlrWF.jpg
+71,17,에스프레소,4000,https://i.imgur.com/1DmkVuW.jpg
+72,18,아메리카노,4000,https://i.imgur.com/jQATmnL.jpg
+73,18,카페라떼,4000,https://i.imgur.com/SlUQMIU.jpg
+74,18,녹차라떼,4000,https://i.imgur.com/Qf20hzD.jpg
+75,19,아메리카노,4000,https://i.imgur.com/j4oqYFW.jpg
+76,19,카페라떼,4000,https://i.imgur.com/YzeL6Fp.jpg
+77,19,당근 케이크,6000,https://i.imgur.com/vHTKJml.jpg
+78,20,초코 스콘,5000,https://i.imgur.com/0zRrOll.jpg
+79,20,아메리카노,4000,https://i.imgur.com/qMKlrWF.jpg
+80,20,에스프레소,4000,https://i.imgur.com/1DmkVuW.jpg
