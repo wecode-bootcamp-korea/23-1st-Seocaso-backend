@@ -10,7 +10,7 @@ from cafes.models   import Cafe
 
 class RatingRankingView(View):
     def get(self, request):
-        cafe_avg_rating      = StarRating.objects.values('cafe_id').annotate(avg_rating=Avg('score'))
+        cafe_avg_rating        = StarRating.objects.values('cafe_id').annotate(avg_rating=Avg('score'))
         rating_ranking         = list(cafe_avg_rating.order_by('-avg_rating'))
         rating_ranking_results = []
 
