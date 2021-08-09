@@ -7,6 +7,7 @@ from django.views         import View
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
+from ratings.models import StarRating
 
 class ReviewView(View):
     @log_in_confirm
@@ -43,3 +44,7 @@ class ReviewView(View):
 
         review.delete()
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
+
+class RatingCountView(View):
+    def get(self, request):
+        return JsonResponse({'RATINGS_COUNT' : StarRating.objects.count()}, status=200)
