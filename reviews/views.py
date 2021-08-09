@@ -17,10 +17,10 @@ class CommentOnReviewView(View):
         cafe_id = Review.objects.get(id=review_id).cafe_id
 
         Review.objects.create(
-            content           = data['content'],
-            cafe              = Cafe.objects.get(id=cafe_id),
-            comment_on_review = Review.objects.get(id=review_id),
-            user              = request.user
+            content              = data['content'],
+            cafe_id              = cafe_id,
+            comment_on_review_id = review_id,
+            user                 = request.user
         )
 
         return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
