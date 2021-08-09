@@ -360,3 +360,5 @@ zsdoc/data
 
 my_settings.py
 csv_files
+
+db_uploader.py
