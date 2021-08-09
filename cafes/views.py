@@ -12,9 +12,8 @@ from users.models   import User
 from utils          import log_in_confirm
 
 class CafeDetailView(View):
-    @log_in_confirm
-    def get(self, request, cafe_id):
-        try:          
+    #@log_in_confirm
+    def get(self, request, cafe_id):         
             cafe                 = Cafe.objects.get(id=cafe_id)
             menus                = Menu.objects.filter(cafe_id=cafe_id)
             reviews              = Review.objects.filter(
@@ -36,7 +35,7 @@ class CafeDetailView(View):
                     'price'    : '{:.0f}원'.format(menu.price)
                 }
                 )
-
+            
             review_list = []
 
             for review in reviews:
@@ -55,7 +54,9 @@ class CafeDetailView(View):
                 {
                     'nickname'         : User.objects.get(id=review.user_id).nickname,
                     'profile_image'    : User.objects.get(id=review.user_id).image_url,
-                    'star_rating'      : StarRating.objects.get(user_id=review.user_id).score,
+                    'star_rating'      : StarRating.objects.get(
+                        cafe_id=cafe_id, user_id=review.user_id
+                        ).score,
                     'content'          : review.content,
                     'review_like'      : ReviewLike.objects.filter(review_id=review.id).count(),
                     'comment_on_review': len(comment_in_review_list)
@@ -72,13 +73,12 @@ class CafeDetailView(View):
             cafe_ranking_number = [x['cafe_id'] for x in list(cafe_ranking)].index(cafe_id) + 1
             
             review_count = reviews.values('cafe_id').annotate(cnt=Count('id'))
-            review_ranking = review_count.order_by('-cnt')
-            review_ranking_number = [x['cafe_id'] for x in list(review_ranking)].index(cafe_id) + 1
+            review_ranking_number = [x['cafe_id'] for x in list(review_count)].index(cafe_id) + 1
 
             cafe_score = StarRating.objects.filter(cafe_id=cafe_id).values('cafe_id', 'score')
             score_count = cafe_score.values('score').annotate(count_score=Count('score'))
             max_ratings = score_count.order_by('-count_score')
-            max_ratings_count = [x['count_score'] for x in list(max_ratings)][0] + 1 
+            max_ratings_count = [x['count_score'] for x in list(max_ratings)][0]
 
             for background_image_url in background_image_urls:
                 background_image_url_list.append(
@@ -147,32 +147,23 @@ class CafeDetailView(View):
                     recommendation.append({
                         'cafe_name'          : recommended_cafe.name,
                         'average_star_rating': '{:.1f}'.format(average_score),
-                        'cafe_image'         : recommended_cafe.main_image_url
+                        'url'                : recommended_cafe.main_image_url
                     }   
                     )
                 else:
                     recommendation.append({
                         'cafe_name'          : recommended_cafe.name,
                         'average_star_rating': '0',
-                        'cafe_image'         : recommended_cafe.main_image_url
+                        'url'                : recommended_cafe.main_image_url
                     }   
                     )
 
-            datas = []
-            
-            datas.append(
-                {
+            return JsonResponse({
                     'menus'         : menu_list,
                     'reviews'       : review_list,
                     'informations'  : informations,
                     'recommendation': recommendation,
-                }
-            )
-
-            return JsonResponse({'data':datas}, status=200)
-
-        except ValueError:
-            return JsonResponse({'MESSAGE':'VALUE_ERROR'}, status=400)        
+                    }, status=200)    
             
 
 
