@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.http.response import JsonResponse
+from django.views import View
 
-# Create your views here.
+from ratings.models import StarRating
+
+class RatingCountView(View):
+    def get(self, request):
+        return JsonResponse({'RATINGS_COUNT' : StarRating.objects.count()}, status=200)
