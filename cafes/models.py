@@ -26,3 +26,16 @@ class CafeImage(models.Model):
 
     class Meta:
         db_table = 'cafe_images'
+
+class Collection(models.Model):
+    user = models.ForeignKey('users.user', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'collections'
+
+class CafeCollection(models.Model):
+    cafe       = models.ForeignKey('cafe', on_delete=models.CASCADE)
+    collection = models.ForeignKey('cafecollection', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'cafe_collections'

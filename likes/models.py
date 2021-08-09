@@ -14,3 +14,8 @@ class ReviewLike(models.Model):
     class Meta:
         db_table = 'review_likes'
 
+class CollectionLike(models.Model):
+    user = models.ForeignKey('users.user', on_delete=models.CASCADE)
+    collection = models.ForeignKey('cafes.cafecollection', on_delete=models.CASCADE)
+
+
