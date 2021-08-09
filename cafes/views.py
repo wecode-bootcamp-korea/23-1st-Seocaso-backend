@@ -12,7 +12,7 @@ from users.models   import User
 from utils          import log_in_confirm
 
 class CafeDetailView(View):
-    #@log_in_confirm
+    @log_in_confirm
     def get(self, request, cafe_id):         
             
             cafe                 = Cafe.objects.get(id=cafe_id)
@@ -20,107 +20,112 @@ class CafeDetailView(View):
             reviews              = Review.objects.filter(
                 cafe_id = cafe_id, comment_on_review_id__isnull = True
             )
-            comment_in_reviews   = Review.objects.filter(
-                cafe_id = cafe_id, comment_on_review_id__isnull = False
-            )
             gallery_image_urls = CafeImage.objects.filter(cafe_id=cafe_id)
             star_ratings = StarRating.objects.filter(cafe_id=cafe_id)
-
-            menu_list = []
-
-            for menu in menus:
-                menu_list.append(
-                {
+            
+            menu_list = [{
                     'id'       : menu.id,
                     'url'      : menu.image_url,
                     'menu_name': menu.name,
                     'price'    : '{:.0f}원'.format(menu.price)
-                }
-                )
+                } for menu in menus
+            ]
+
+            review_list = [{   
+                'id'                : review.user_id,
+                'nickname'          : User.objects.get(id=review.user_id).nickname,
+                'profile_image'     : User.objects.get(id=review.user_id).image_url,
+                'star_rating'       : StarRating.objects.get(
+                    cafe_id = cafe_id, user_id = review.user_id
+                    ).score,
+                'content'           : review.content,
+                'review_like'       : ReviewLike.objects.filter(review_id=review.id).count(),
+                'comment_on_review' : Review.objects.filter(comment_on_review_id = review.id).count()
+                } for review in reviews
+            ]
+
+            if star_ratings.exists():
+                star_rating_value = StarRating.objects.values('cafe_id', 'score')            
+                cafe_avg_rating = star_rating_value.values('cafe_id').annotate(avg_score=Avg('score'))
+                cafe_ranking = cafe_avg_rating.order_by('-avg_score')
+                cafe_ranking_number = [x['cafe_id'] for x in list(cafe_ranking)].index(cafe_id) + 1
+            else:
+                cafe_ranking_number = None
             
-            review_list = []
+            if reviews.exists():
+                review_count = reviews.values('cafe_id').annotate(cnt=Count('id'))
+                review_ranking_number = [x['cafe_id'] for x in list(review_count)].index(cafe_id) + 1
+            else:
+                review_ranking_number = None
 
-            for review in reviews:
-                
-                comment_in_review_list = []
-
-                for comment_in_review in comment_in_reviews:
-
-                    comment_in_review_list.append(
-                        {
-                            'comment_in_review' : comment_in_review.content 
-                        }
-                    )
-
-                review_list.append(
-                {   
-                    'id'               : review.user_id,
-                    'nickname'         : User.objects.get(id=review.user_id).nickname,
-                    'profile_image'    : User.objects.get(id=review.user_id).image_url,
-                    'star_rating'      : StarRating.objects.get(
-                        cafe_id = cafe_id, user_id = review.user_id
-                        ).score,
-                    'content'          : review.content,
-                    'review_like'      : ReviewLike.objects.filter(review_id=review.id).count(),
-                    'comment_on_review': len(comment_in_review_list)
-                }
-                )
-            
-            informations = []
-
-            gallery_image_list = []
-
-            star_rating_value = StarRating.objects.values('cafe_id', 'score')            
-            cafe_avg_rating = star_rating_value.values('cafe_id').annotate(avg_score=Avg('score'))
-            cafe_ranking = cafe_avg_rating.order_by('-avg_score')
-            cafe_ranking_number = [x['cafe_id'] for x in list(cafe_ranking)].index(cafe_id) + 1
-
-            cafe_score = star_ratings.values('cafe_id', 'score')
-            score_count = cafe_score.values('score').annotate(count_score=Count('score'))
-            max_ratings = score_count.order_by('-count_score')
-            max_ratings_count = [x['count_score'] for x in list(max_ratings)][0]
-            
-            review_count = reviews.values('cafe_id').annotate(cnt=Count('id'))
-            review_ranking_number = [x['cafe_id'] for x in list(review_count)].index(cafe_id) + 1
-
-            for gallery_image_url in gallery_image_urls:
-                gallery_image_list.append({
+            gallery_image_list = [{
                     'index' : gallery_image_url.id, 
                     'img' : gallery_image_url.image_url
-                }
-                )
+                } for gallery_image_url in gallery_image_urls
+            ]
 
-            informations = {   
-                'id'                 : cafe_id,
-                'name'               : cafe.name,
-                'business_hour'      : cafe.business_hours,
-                'address'            : cafe.address,
-                'phone_number'       : cafe.phone_number,
-                'description'        : cafe.description,
-                'star_rating_ranking': cafe_ranking_number,
-                'average_star_rating': star_ratings,
-                'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
-                'cafe_image_url'     : cafe.main_image_url,
-                'gallery_image'      : gallery_image_list,
-                'evaluation_graphs'  : [{
-                    '0.5' : StarRating.objects.filter(cafe_id=cafe_id, score=0.5).count(),
-                    '1.0' : StarRating.objects.filter(cafe_id=cafe_id, score=1.0).count(),
-                    '1.5' : StarRating.objects.filter(cafe_id=cafe_id, score=1.5).count(),
-                    '2.0' : StarRating.objects.filter(cafe_id=cafe_id, score=2.0).count(),
-                    '2.5' : StarRating.objects.filter(cafe_id=cafe_id, score=2.5).count(),
-                    '3.0' : StarRating.objects.filter(cafe_id=cafe_id, score=3.0).count(),
-                    '3.5' : StarRating.objects.filter(cafe_id=cafe_id, score=3.5).count(),
-                    '4.0' : StarRating.objects.filter(cafe_id=cafe_id, score=4.0).count(),
-                    '4.5' : StarRating.objects.filter(cafe_id=cafe_id, score=4.5).count(),
-                    '5.0' : StarRating.objects.filter(cafe_id=cafe_id, score=5.0).count(),
-                }]                               
-            }
+            if star_ratings.exists():
+                informations = {
+                    'id'                 : cafe_id,
+                    'name'               : cafe.name,
+                    'business_hour'      : cafe.business_hours,
+                    'address'            : cafe.address,
+                    'phone_number'       : cafe.phone_number,
+                    'description'        : cafe.description,
+                    'star_rating_ranking': cafe_ranking_number,
+                    'review_ranking'     : review_ranking_number,
+                    'average_star_rating': '{:.1f}'.format(StarRating.objects.filter(cafe_id=cafe_id)
+                    .aggregate(average = Avg('score'))['average']),
+                    'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
+                    'cafe_image_url'     : cafe.main_image_url,
+                    'background_image'   : gallery_image_list[0], 
+                    'gallery_image'      : gallery_image_list,
+                    'evaluation_graphs'  : [{
+                        '0.5' : StarRating.objects.filter(cafe_id=cafe_id, score=0.5).count(),
+                        '1.0' : StarRating.objects.filter(cafe_id=cafe_id, score=1.0).count(),
+                        '1.5' : StarRating.objects.filter(cafe_id=cafe_id, score=1.5).count(),
+                        '2.0' : StarRating.objects.filter(cafe_id=cafe_id, score=2.0).count(),
+                        '2.5' : StarRating.objects.filter(cafe_id=cafe_id, score=2.5).count(),
+                        '3.0' : StarRating.objects.filter(cafe_id=cafe_id, score=3.0).count(),
+                        '3.5' : StarRating.objects.filter(cafe_id=cafe_id, score=3.5).count(),
+                        '4.0' : StarRating.objects.filter(cafe_id=cafe_id, score=4.0).count(),
+                        '4.5' : StarRating.objects.filter(cafe_id=cafe_id, score=4.5).count(),
+                        '5.0' : StarRating.objects.filter(cafe_id=cafe_id, score=5.0).count(),
+                    }]                               
+                }
+            else:
+                informations = {
+                    'id'                 : cafe_id,
+                    'name'               : cafe.name,
+                    'business_hour'      : cafe.business_hours,
+                    'address'            : cafe.address,
+                    'phone_number'       : cafe.phone_number,
+                    'description'        : cafe.description,
+                    'star_rating_ranking': cafe_ranking_number,
+                    'review_ranking'     : review_ranking_number,
+                    'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
+                    'cafe_image_url'     : cafe.main_image_url,
+                    'background_image'   : gallery_image_list[0], 
+                    'gallery_image'      : gallery_image_list,
+                    'evaluation_graphs'  : [{
+                        '0.5' : StarRating.objects.filter(cafe_id=cafe_id, score=0.5).count(),
+                        '1.0' : StarRating.objects.filter(cafe_id=cafe_id, score=1.0).count(),
+                        '1.5' : StarRating.objects.filter(cafe_id=cafe_id, score=1.5).count(),
+                        '2.0' : StarRating.objects.filter(cafe_id=cafe_id, score=2.0).count(),
+                        '2.5' : StarRating.objects.filter(cafe_id=cafe_id, score=2.5).count(),
+                        '3.0' : StarRating.objects.filter(cafe_id=cafe_id, score=3.0).count(),
+                        '3.5' : StarRating.objects.filter(cafe_id=cafe_id, score=3.5).count(),
+                        '4.0' : StarRating.objects.filter(cafe_id=cafe_id, score=4.0).count(),
+                        '4.5' : StarRating.objects.filter(cafe_id=cafe_id, score=4.5).count(),
+                        '5.0' : StarRating.objects.filter(cafe_id=cafe_id, score=5.0).count(),
+                    }]                               
+                }
+
 
             recommendation = []
 
-            cafe_info = Cafe.objects.get(id=cafe_id)
-
-            recommended_cafes = Cafe.objects.filter(address__icontains=cafe_info.address[:5])[:6] 
+            recommended_cafes = Cafe.objects.filter(address__icontains=cafe.address[:5]
+            ).exclude(id=cafe_id)[:6] 
 
             for recommended_cafe in recommended_cafes:
 
@@ -130,13 +135,15 @@ class CafeDetailView(View):
 
                 if average_score != None:
                     recommendation.append({
+                        'cafe_id'            : recommended_cafe.id,
                         'cafe_name'          : recommended_cafe.name,
-                        #'average_star_rating': '{:.1f}'.format(average_score),
+                        'average_star_rating': '{:.1f}'.format(average_score),
                         'url'                : recommended_cafe.main_image_url
                     }   
                     )
                 else:
                     recommendation.append({
+                        'cafe_id'            : recommended_cafe.id,
                         'cafe_name'          : recommended_cafe.name,
                         'average_star_rating': '0',
                         'url'                : recommended_cafe.main_image_url
@@ -145,8 +152,8 @@ class CafeDetailView(View):
 
             return JsonResponse({
                     'menus'         : menu_list,
-                    'review'        : review_list,
-                    #'information'   : informations,
+                    'reviews'       : review_list,
+                    'information'   : informations,
                     'recommendation': recommendation,
                     }, status=200)    
             
