@@ -18,29 +18,47 @@ from utils          import log_in_confirm
 class CafeListView(View):
     def get(self, request):
         ordering = request.GET.get('ordering', None)
-        cafes = Cafe.objects.all().annotate(review_count=Count('review'), avg_rating=Avg('starrating__score')).order_by('-review_count')
-        results  = []
+        cafes = Cafe.objects.all().values('id').annotate(avg_rating=Avg('starrating__score')).order_by('-avg_rating')
+        results = []
+        cnt = 0
         
         if ordering == '-review_count':
-            for cafe in cafes:
+            cafes_review_count = Cafe.objects.all().annotate(review_count=Count('review')).order_by('-review_count')
+
+            for cafe in cafes_review_count:
+                if cnt == 10:
+                    break
+                cafe_id = cafe.id
+                this = Cafe.objects.get(id=cafe_id)
+
                 results.append({
-                    "id"          : cafe.id,
-                    "name"        : cafe.name,
-                    "image"       : cafe.main_image_url,
-                    "review_count": cafe.review_count
+                    'id' : cafe_id,
+                    'name' : this.name,
+                    'address' : this.address,
+                    'image' : this.main_image_url,
+                    'avg_rating' : '%.1f' % cafes.get(id=cafe_id)['avg_rating']
                 })
+
+                cnt += 1
+
 
         if ordering == '-avg_rating':
-            cafes = Cafe.objects.all().values('id').annotate(avg_rating=Avg('starrating__score')).order_by('-avg_rating')
-
             for cafe in cafes:
+                if cnt == 10:
+                    break
+
                 cafe_id = cafe['id']
+                this = Cafe.objects.get(id=cafe_id)
+
                 results.append({
                     "id"        : cafe_id,
-                    "name"      : Cafe.objects.get(id=cafe_id).name,
-                    "image"     : Cafe.objects.get(id=cafe_id).main_image_url,
+                    "name"      : this.name,
+                    "address"   : this.address,
+                    "image"     : this.main_image_url,
                     "avg_rating": '%.1f' % cafe['avg_rating']
                 })
+
+                cnt += 1
 
         return JsonResponse({'CAFE_LIST': results}, status=200)
 
@@ -98,3 +116,16 @@ class CommentOnReviewView(View):
     )
 
         return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
+
+
+"""
+SELECT 
+    c.id, 
+    c.name, 
+    COUNT(r.id) AS review_count, 
+    AVG(sr.score) AS avg_rating 
+FROM cafes c 
+LEFT OUTER JOIN reviews r ON c.id = r.cafe_id 
+LEFT OUTER JOIN star_ratings sr ON c.id = sr.cafe_id 
+GROUP BY c.id;
+"""
