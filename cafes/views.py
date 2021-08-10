@@ -3,23 +3,25 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
-from django.db.models     import Count, Avg
+from django.db.models     import Avg, Q
 
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
+from users.models   import User
 
 class UserCafeListView(View):
     def get(self, request, user_id):
-        ordering  = request.GET.get('ordering', None)
-        category = request.GET.get('filtering', None)
+        if not User.objects.filter(id=user_id).exists():
+            return JsonResponse({'MESSAGE' : 'USER_DOES_NOT_EXIST'}, status=400)
 
-        order = {
+        ordering = request.GET.get('ordering', None)
+        category = request.GET.get('category', None)
+
+        order    = {
             'high_rating': '-avg_rating',
             'low_rating' : 'avg_rating'
         }
-
-        
 
         if category == 'like':
             cafes   = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
@@ -44,7 +46,7 @@ class UserCafeListView(View):
                     'name'       : cafe.name,
                     'image'      : cafe.main_image_url,
                     'address'    : cafe.address,
-                    'user_rating': Cafe.objects.get(id=cafe.id).starrating_set
+                    'user_rating': Cafe.objects.get(id=cafe.id).starrating_set.get(user_id=user_id).score
                 } for cafe in cafes ]
 
         return JsonResponse({'CAFE_LIST' : results}, status=200)
