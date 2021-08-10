@@ -18,11 +18,10 @@ from utils          import log_in_confirm
 class CafeListView(View):
     def get(self, request):
         ordering = request.GET.get('ordering', None)
+        cafes = Cafe.objects.all().annotate(review_count=Count('review'), avg_rating=Avg('starrating__score')).order_by('-review_count')
         results  = []
         
         if ordering == '-review_count':
-            cafes = Cafe.objects.all().annotate(review_count=Count('review')).order_by('-review_count')
-
             for cafe in cafes:
                 results.append({
                     "id"          : cafe.id,
