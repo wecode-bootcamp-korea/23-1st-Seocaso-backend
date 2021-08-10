@@ -3,10 +3,48 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
+
+class UserCafeListView(View):
+    def get(self, request, user_id):
+        filter = request.GET.get('filter', None)
+
+        results = []
+        cafes_user_rated = Cafe.objects.filter(starrating__user_id=user_id)
+
+        if not filter:
+            for cafe in cafes_user_rated:
+                results.append({
+                    'id' : cafe.id,
+                    'name' : cafe.name,
+                    'address' : cafe.address,
+                    'image' : cafe.main_image_url,
+                    'like_count' : cafes_user_rated.annotate(like_count=Count('cafelike')).get(id=cafe.id).like_count
+                })
+            
+            return JsonResponse({'CAFE_LIST' : results})
+        
+        if filter == '-avg_rating':
+            avg_ranking = Cafe.objects.values('id').annotate(avg_rating=Avg('starrating__score')).order_by('-avg_rating')
+            ids         = [ x['id'] for x in cafes_user_rated ]
+
+            for cafe in avg_ranking:
+                if cafe['id'] in ids:
+                    cafe_id = cafe['id']
+                    this    = Cafe.objects.get(id=cafe_id)
+
+                    results.append({
+                        'cafe_id' : cafe_id,
+                        'cafe_name' : this.name,
+                        'cafe_image' : this.main_image_url,
+                        'cafe_address' : this.address,
+                        'user_rating' : ,
+                    })
+
 
 class ReviewView(View):
     @log_in_confirm
