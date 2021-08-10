@@ -3,11 +3,47 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
-from django.db.models     import Count
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
+
+"""
+/cafes
+/cafes?ordering=-review_count
+/cafes?ordering=-id
+"""
+
+class CafeListView(View):
+    def get(self, request):
+        ordering = request.GET.get('ordering', None)
+        results  = []
+        
+        if ordering == '-review_count':
+            cafes = Cafe.objects.all().annotate(review_count=Count('review')).order_by('-review_count')
+
+            for cafe in cafes:
+                results.append({
+                    "id"          : cafe.id,
+                    "name"        : cafe.name,
+                    "image"       : cafe.main_image_url,
+                    "review_count": cafe.review_count
+                })
+
+        if ordering == '-avg_rating':
+            cafes = Cafe.objects.all().values('id').annotate(avg_rating=Avg('starrating__score')).order_by('-avg_rating')
+
+            for cafe in cafes:
+                cafe_id = cafe['id']
+                results.append({
+                    "id"        : cafe_id,
+                    "name"      : Cafe.objects.get(id=cafe_id).name,
+                    "image"     : Cafe.objects.get(id=cafe_id).main_image_url,
+                    "avg_rating": '%.1f' % cafe['avg_rating']
+                })
+
+        return JsonResponse({'CAFE_LIST': results}, status=200)
 
 class ReviewView(View):
     @log_in_confirm
@@ -44,36 +80,3 @@ class ReviewView(View):
 
         review.delete()
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
-
-class ReviewRankingView(View):
-    def get(self, request):
-        cafe_reviews           = Review.objects.filter(comment_on_review_id__isnull=True).values('cafe_id').annotate(cnt=Count('id'))
-        review_ranking         = list(cafe_reviews.order_by('-cnt'))
-        review_ranking_results = []
-
-        if len(review_ranking) > 10:
-            for i in range(10):
-                cafe_id           = Cafe.objects.get(id=review_ranking[i]['cafe_id']).id
-                cafe_review_count = review_ranking[i]['cnt']
-
-                review_ranking_results.append({
-                    'cafe_id'           : cafe_id,
-                    'cafe_name'         : Cafe.objects.get(id=cafe_id).name,
-                    'cafe_image'        : Cafe.objects.get(id=cafe_id).main_image_url,
-                    'cafe_address'      : Cafe.objects.get(id=cafe_id).address,
-                    'cafe_review_counts': cafe_review_count
-                })
-        else:
-            for i in range(cafe_reviews.count()):
-                cafe_id           = Cafe.objects.get(id=review_ranking[i]['cafe_id'])
-                cafe_review_count = review_ranking[i]['cnt']
-
-                review_ranking_results.append({
-                    'cafe_id'           : cafe_id,
-                    'cafe_name'         : Cafe.objects.get(id=cafe_id).name,
-                    'cafe_image'        : Cafe.objects.get(id=cafe_id).main_image_url,
-                    'cafe_address'      : Cafe.objects.get(id=cafe_id).address,
-                    'cafe_review_counts': cafe_review_count
-                })
-
-        return JsonResponse({'REVIEW_RANKING': review_ranking_results}, status=200)
