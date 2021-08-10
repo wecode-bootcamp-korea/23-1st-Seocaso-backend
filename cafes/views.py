@@ -12,19 +12,40 @@ from utils          import log_in_confirm
 class UserCafeListView(View):
     def get(self, request, user_id):
         ordering  = request.GET.get('ordering', None)
-        filtering = request.GET.get('filtering', None)
-        results = []
-
-        # ids = [ x.id for x in Cafe.objects.filter(cafelike__user_id=user_id) ]
+        category = request.GET.get('filtering', None)
 
         order = {
-            'high_rating' : '-avg_rating',
+            'high_rating': '-avg_rating',
             'low_rating' : 'avg_rating'
         }
 
-        if ordering:
-            cafes_user_liked = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score')).order_by(order.get(ordering, 'id')).filter(cafelike__user_id=user_id)
-        
+        q = Q()
+
+
+
+        cafes = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
+                                  .order_by(order.get(ordering, 'id'))\
+                                  .filter(cafelike__user_id=user_id)
+
+        if category == 'like':
+            results = [ {
+                    'id'        : cafe.id,
+                    'name'      : cafe.name,
+                    'image'     : cafe.main_image_url,
+                    'address'   : cafe.address,
+                    'avg_rating': '%.1f' % cafe.avg_rating
+                } for cafe in cafes ]
+
+        if category == 'rate':
+            results = [ {
+                    'id'         : cafe.id,
+                    'name'       : cafe.name,
+                    'image'      : cafe.main_image_url,
+                    'address'    : cafe.address,
+                    'user_rating': 123
+                } for cafe in cafes ]
+
+        return JsonResponse({'CAFE_LIST' : results}, status=200)
 
 
 
