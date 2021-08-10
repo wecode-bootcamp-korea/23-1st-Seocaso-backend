@@ -67,8 +67,6 @@ class CommentOnReviewView(View):
 class MenuView(View):
     def get(self, request, cafe_id):
             menus = Menu.objects.filter(cafe_id=cafe_id)
-            gallery_image_urls = CafeImage.objects.filter(cafe_id=cafe_id)
-            star_ratings       = StarRating.objects.filter(cafe_id=cafe_id)
             
             menu_list = [{
                     'id'       : menu.id,
