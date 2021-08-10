@@ -12,7 +12,7 @@ from utils          import log_in_confirm
 """
 /cafes
 /cafes?ordering=-review_count
-/cafes?ordering=-id
+/cafes?ordering=-avg_rating
 """
 
 class CafeListView(View):
