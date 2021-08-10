@@ -19,15 +19,13 @@ class UserCafeListView(View):
             'low_rating' : 'avg_rating'
         }
 
-        q = Q()
+        
 
-
-
-        cafes = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
+        if category == 'like':
+            cafes   = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
                                   .order_by(order.get(ordering, 'id'))\
                                   .filter(cafelike__user_id=user_id)
 
-        if category == 'like':
             results = [ {
                     'id'        : cafe.id,
                     'name'      : cafe.name,
@@ -37,12 +35,16 @@ class UserCafeListView(View):
                 } for cafe in cafes ]
 
         if category == 'rate':
+            cafes = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
+                                  .order_by(order.get(ordering, 'id'))\
+                                  .filter(starrating__user_id=user_id)
+
             results = [ {
                     'id'         : cafe.id,
                     'name'       : cafe.name,
                     'image'      : cafe.main_image_url,
                     'address'    : cafe.address,
-                    'user_rating': 123
+                    'user_rating': Cafe.objects.get(id=cafe.id).starrating_set
                 } for cafe in cafes ]
 
         return JsonResponse({'CAFE_LIST' : results}, status=200)
