@@ -6,6 +6,7 @@ from django.views         import View
 
 from reviews.models import Review
 from cafes.models   import Cafe
+from ratings.models import StarRating
 from utils          import log_in_confirm
 
 class ReviewView(View):
