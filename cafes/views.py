@@ -13,8 +13,8 @@ class CafeListView(View):
     def get(self, request):
         ordering = request.GET.get('ordering', None)
         order    = {
-            "high_rate" : "-avg_rating",
-            "count_high": "-review_count"
+            "high_rating": "-avg_rating",
+            "high_count" : "-review_count"
         }
 
         cafes   = Cafe.objects.all().annotate(review_count=Count('review', distinct=True)).annotate(avg_rating=Avg('starrating__score', distinct=True)).order_by(order.get(ordering, 'id'))[:10]
