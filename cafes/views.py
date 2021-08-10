@@ -47,9 +47,11 @@ class ReviewView(View):
 class CommentOnReviewView(View):
     @log_in_confirm
     def post(self, request, review_id):
+        data    = json.loads(request.body)
 
-        data = json.loads(request.body)
-
+        if not Review.objects.filter(id=review_id).exists(): 
+            return JsonResponse({'MESSAGE':'REVIEW_DOES_NOT_EXIST'}, status=404)
+            
         cafe_id = Review.objects.get(id=review_id).cafe_id
 
         Review.objects.create(
