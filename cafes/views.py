@@ -14,6 +14,17 @@ from utils          import log_in_confirm
 /cafes?ordering=-review_count
 /cafes?ordering=-avg_rating
 """
+"""
+SELECT 
+    c.id, 
+    c.name, 
+    COUNT(r.id) AS review_count, 
+    AVG(sr.score) AS avg_rating 
+FROM cafes c 
+LEFT OUTER JOIN reviews r ON c.id = r.cafe_id 
+LEFT OUTER JOIN star_ratings sr ON c.id = sr.cafe_id 
+GROUP BY c.id;
+"""
 
 class CafeListView(View):
     def get(self, request):
@@ -116,16 +127,3 @@ class CommentOnReviewView(View):
     )
 
         return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
-
-
-"""
-SELECT 
-    c.id, 
-    c.name, 
-    COUNT(r.id) AS review_count, 
-    AVG(sr.score) AS avg_rating 
-FROM cafes c 
-LEFT OUTER JOIN reviews r ON c.id = r.cafe_id 
-LEFT OUTER JOIN star_ratings sr ON c.id = sr.cafe_id 
-GROUP BY c.id;
-"""
