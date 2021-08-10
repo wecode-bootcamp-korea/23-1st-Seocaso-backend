@@ -15,16 +15,17 @@ class UserCafeListView(View):
         filtering = request.GET.get('filtering', None)
         results = []
 
+        # ids = [ x.id for x in Cafe.objects.filter(cafelike__user_id=user_id) ]
+
         order = {
             'high_rating' : '-avg_rating',
             'low_rating' : 'avg_rating'
         }
 
-        cafes_user_liked = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score')).order_by(order.get(ordering, 'id')).filter()
+        if ordering:
+            cafes_user_liked = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score')).order_by(order.get(ordering, 'id')).filter(cafelike__user_id=user_id)
+        
 
-        results.append({
-            'cafe_id'
-        })
 
 
 class ReviewView(View):
