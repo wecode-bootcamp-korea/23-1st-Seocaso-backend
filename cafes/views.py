@@ -22,11 +22,11 @@ class CafeListView(View):
         
         for cafe in cafes:
             results.append({
-                'cafe_id' : cafe.id,
-                'cafe_name' : cafe.name,
-                'cafe_image' : cafe.main_image_url,
-                'cafe_address' : cafe.address,
-                'cafe_avg_rating' : '%.1f' % cafe.avg_rating
+                'id' : cafe.id,
+                'name' : cafe.name,
+                'image' : cafe.main_image_url,
+                'address' : cafe.address,
+                'avg_rating' : '%.1f' % cafe.avg_rating
             })
 
         return JsonResponse({'CAFE_LIST': results}, status=200)
