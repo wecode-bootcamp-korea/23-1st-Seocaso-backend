@@ -107,8 +107,6 @@ class CafeInformationView(View):
                 'description'        : cafe.description,
                 'star_rating_ranking': cafe_ranking_number,
                 'review_ranking'     : review_ranking_number,
-                'average_star_rating': '{:.1f}'.format(StarRating.objects.filter(cafe_id=cafe_id)
-                .aggregate(average = Avg('score'))['average']),
                 'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
                 'cafe_image_url'     : cafe.main_image_url,
                 'background_image'   : gallery_image_list[0], 
@@ -154,4 +152,3 @@ class CafeInformationView(View):
                 ]                               
             }
         return JsonResponse({'informations':informations}, status=200)
-
