@@ -11,7 +11,11 @@ from utils          import log_in_confirm
 
 class UserCafeListView(View):
     def get(self, request, user_id):
-        filter = request.GET.get('filter', None)
+        filtering = request.GET.get('filter', None)
+
+        filter = {
+            ''
+        }
 
         results = []
         cafes_user_rated = Cafe.objects.filter(starrating__user_id=user_id)
