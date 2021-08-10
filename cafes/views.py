@@ -3,6 +3,7 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe
@@ -100,15 +101,16 @@ class StarRatingView(View):
 
         star_ratings = StarRating.objects.filter(cafe_id=cafe_id)
 
-        results = []
-
-        for star_rating in star_ratings:
-            results.append(
-                {
-                    'score': star_rating.score,
-                    'cafe_id' : star_rating.cafe_id,
-                    'user_id' : star_rating.user_id
-                }
-            )
+        if star_ratings.exists():
+            results = {
+                        'total_count': star_ratings.values('score').aggregate(cnt=Count('score'))['cnt'],
+                        'average'   : '{:.1f}'.format(star_ratings.aggregate(
+                            average = Avg('score'))['average']),
+                    }
+        else:
+            results = {
+                        'total_count': '0',
+                        'average'   : '0'
+                    }
 
         return JsonResponse({'result':results}, status=200)
