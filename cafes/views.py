@@ -43,3 +43,20 @@ class ReviewView(View):
 
         review.delete()
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
+    
+class CommentOnReviewView(View):
+    @log_in_confirm
+    def post(self, request, review_id):
+
+        data = json.loads(request.body)
+
+        cafe_id = Review.objects.get(id=review_id).cafe_id
+
+        Review.objects.create(
+            content              = data['content'],
+            cafe_id              = cafe_id,
+            comment_on_review_id = review_id,
+            user                 = request.user
+    )
+
+        return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
