@@ -119,7 +119,7 @@ class MenuView(View):
         ]
         return JsonResponse({'menus':menu_list}, status=200)
 
-class CafeInformationView(View):
+class CafeView(View):
     def get(self, request, cafe_id):
         if not Cafe.objects.filter(id=cafe_id).exists():
             return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=404)
@@ -144,6 +144,8 @@ class CafeInformationView(View):
         cafe_review = Cafe.objects.annotate(cnt=Count('review__id')).filter(cnt__gt=0).values_list('id', flat=True).order_by('-cnt')
         review_ranking = list(cafe_review).index(cafe_id) + 1 if cafe_id in cafe_review else None
 
+        gallery_images = [{'index':image.id, 'img':image.image_url} for image in cafe.cafeimage_set.all()]
+
         informations = {
             'id'                 : cafe_id,
             'name'               : cafe.name,
@@ -153,21 +155,10 @@ class CafeInformationView(View):
             'description'        : cafe.description,
             'star_rating_ranking': cafe_ranking,
             'review_ranking'     : review_ranking,
-            'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
+            'likes'              : cafe.cafelike_set.all().count(),
             'cafe_image_url'     : cafe.main_image_url,
-            'background_image'   : gallery_image_list[0], 
-            'gallery_image'      : gallery_image_list,
-            'evaluation_graphs'  : [
-                StarRating.objects.filter(cafe_id=cafe_id, score=0.5).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=1.0).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=1.5).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=2.0).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=2.5).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=3.0).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=3.5).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=4.0).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=4.5).count(),
-                StarRating.objects.filter(cafe_id=cafe_id, score=5.0).count(),
-            ]                              
+            'background_image'   : gallery_images[0], 
+            'gallery_image'      : gallery_images,
+            'evaluation_graphs'  : [cafe.A, cafe.B, cafe.C, cafe.D, cafe.E, cafe.F, cafe.G, cafe.H, cafe.I, cafe.J]                              
         }
         return JsonResponse({'informations':informations}, status=200)
