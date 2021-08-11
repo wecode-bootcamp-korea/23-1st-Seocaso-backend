@@ -78,7 +78,7 @@ class ReviewView(View):
                 'star_rating'       : review.user.starrating_set.get(cafe_id=cafe_id).score,
                 'content'           : review.content,
                 'review_like'       : review.like_count,
-                'comment_on_review' : review.comment_on_review if review.comment_on_review else 0
+                'comment_on_review' : review.comment_on_review.count() if review.comment_on_review else 0
                 } for review in reviews
             ]
         return JsonResponse({'reviews':review_list}, status=200)
