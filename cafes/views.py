@@ -23,7 +23,7 @@ class UserCafeListView(View):
             'low_rating' : 'avg_rating'
         }
 
-        if category == 'like':
+        if category == 'liked':
             cafes   = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
                                   .order_by(order.get(ordering, 'id'))\
                                   .filter(cafelike__user_id=user_id)
@@ -36,7 +36,7 @@ class UserCafeListView(View):
                     'avg_rating': '%.1f' % cafe.avg_rating
                 } for cafe in cafes ]
 
-        if category == 'rate':
+        if category == 'rated':
             cafes = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
                                   .order_by(order.get(ordering, 'id'))\
                                   .filter(starrating__user_id=user_id)
