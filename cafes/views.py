@@ -3,10 +3,33 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
+
+class CafeListView(View):
+    def get(self, request):
+        ordering = request.GET.get('ordering', None)
+        order    = {
+            "high_rating": "-avg_rating",
+            "high_count" : "-review_count"
+        }
+
+        cafes   = Cafe.objects.all().annotate(review_count=Count('review', distinct=True))\
+                                    .annotate(avg_rating=Avg('starrating__score', distinct=True))\
+                                    .order_by(order.get(ordering, 'id'))[:10]
+
+        results = [ {
+            'id' : cafe.id,
+            'name' : cafe.name,
+            'image' : cafe.main_image_url,
+            'address' : cafe.address,
+            'avg_rating' : '%.1f' % cafe.avg_rating
+        } for cafe in cafes ]
+
+        return JsonResponse({'CAFE_LIST': results}, status=200)
 
 class ReviewView(View):
     @log_in_confirm
