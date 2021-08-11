@@ -3,11 +3,34 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe
 from utils          import log_in_confirm
 from ratings.models import StarRating
+
+class CafeListView(View):
+    def get(self, request):
+        ordering = request.GET.get('ordering', None)
+        order    = {
+            "high_rating": "-avg_rating",
+            "high_count" : "-review_count"
+        }
+
+        cafes   = Cafe.objects.all().annotate(review_count=Count('review', distinct=True))\
+                                    .annotate(avg_rating=Avg('starrating__score', distinct=True))\
+                                    .order_by(order.get(ordering, 'id'))[:10]
+
+        results = [ {
+            'id' : cafe.id,
+            'name' : cafe.name,
+            'image' : cafe.main_image_url,
+            'address' : cafe.address,
+            'avg_rating' : '%.1f' % cafe.avg_rating
+        } for cafe in cafes ]
+
+        return JsonResponse({'CAFE_LIST': results}, status=200)
 
 class ReviewView(View):
     @log_in_confirm
@@ -48,3 +71,22 @@ class ReviewView(View):
 class RatingCountView(View):
     def get(self, request):
         return JsonResponse({'RATINGS_COUNT' : StarRating.objects.count()}, status=200)
+    
+class CommentOnReviewView(View):
+    @log_in_confirm
+    def post(self, request, review_id):
+        data    = json.loads(request.body)
+
+        if not Review.objects.filter(id=review_id).exists(): 
+            return JsonResponse({'MESSAGE':'REVIEW_DOES_NOT_EXIST'}, status=404)
+            
+        cafe_id = Review.objects.get(id=review_id).cafe_id
+
+        Review.objects.create(
+            content              = data['content'],
+            cafe_id              = cafe_id,
+            comment_on_review_id = review_id,
+            user                 = request.user
+    )
+
+        return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)

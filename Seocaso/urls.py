@@ -1,5 +1,4 @@
 """Seocaso URL Configuration
-
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
 Examples:
@@ -17,6 +16,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('users', include('users.urls')),
-    path('cafe', include('cafes.urls')),
     path('cafes', include('cafes.urls')),
+    path('review', include('cafes.urls')),
+    path('like', include('likes.urls'))
 ]
