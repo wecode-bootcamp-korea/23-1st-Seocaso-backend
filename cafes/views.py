@@ -118,3 +118,37 @@ class MenuView(View):
             } for menu in menus
         ]
         return JsonResponse({'menus':menu_list}, status=200)
+        
+class RecommendationView(View):
+    def get(self, request, cafe_id):
+
+        cafe = Cafe.objects.get(id=cafe_id)
+        
+        recommendation = []
+
+        recommended_cafes = Cafe.objects.filter(address__icontains=cafe.address[:5]
+        ).exclude(id=cafe_id)[:6] 
+
+        for recommended_cafe in recommended_cafes:
+
+            average_score = StarRating.objects.filter(
+                cafe_id=recommended_cafe.id
+                ).aggregate(average = Avg('score'))['average']
+
+            if average_score != None:
+                recommendation.append({
+                    'cafe_id'            : recommended_cafe.id,
+                    'cafe_name'          : recommended_cafe.name,
+                    'average_star_rating': '{:.1f}'.format(average_score),
+                    'url'                : recommended_cafe.main_image_url
+                }   
+                )
+            else:
+                recommendation.append({
+                    'cafe_id'            : recommended_cafe.id,
+                    'cafe_name'          : recommended_cafe.name,
+                    'average_star_rating': '0',
+                    'url'                : recommended_cafe.main_image_url
+                }   
+                )
+        return JsonResponse({'recommendation':recommendation}, status=200)
