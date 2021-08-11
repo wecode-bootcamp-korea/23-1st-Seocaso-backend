@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
-from django.db.models     import Count, Avg
+from django.db.models     import Count, Avg, F
 
 from reviews.models import Review
 from cafes.models   import Cafe
@@ -71,18 +71,16 @@ class ReviewView(View):
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
 
     def get(self, request, cafe_id):
-        reviews = Review.objects.filter(cafe_id = cafe_id, comment_on_review_id__isnull = True)
+        reviews = Review.objects.filter(cafe_id=cafe_id).annotate(like_count=Count('reviewlike')).order_by('-like_count')
 
         review_list = [{   
                 'id'                : review.user_id,
-                'nickname'          : User.objects.get(id=review.user_id).nickname,
-                'profile_image'     : User.objects.get(id=review.user_id).image_url,
-                'star_rating'       : StarRating.objects.get(
-                    cafe_id = cafe_id, user_id = review.user_id
-                    ).score,
+                'nickname'          : review.user.nickname,
+                'profile_image'     : review.user.image_url,
+                'star_rating'       : review.user.starrating_set.get(cafe_id=cafe_id).score,
                 'content'           : review.content,
-                'review_like'       : ReviewLike.objects.filter(review_id=review.id).count(),
-                'comment_on_review' : Review.objects.filter(comment_on_review_id = review.id).count()
+                'review_like'       : review.like_count,
+                'comment_on_review' : review.comment_on_review if review.comment_on_review else 0
                 } for review in reviews
             ]
         return JsonResponse({'reviews':review_list}, status=200)
