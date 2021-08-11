@@ -118,6 +118,7 @@ class MenuView(View):
             } for menu in menus
         ]
         return JsonResponse({'menus':menu_list}, status=200)
+        
 class SearchView(View):
     def get(self, request):
         search_keyword = request.GET.get('q', '')
