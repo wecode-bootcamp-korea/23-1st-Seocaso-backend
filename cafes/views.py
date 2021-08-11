@@ -24,7 +24,7 @@ class UserCafeListView(View):
         }
 
         avg_ranking   = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
-                                  .order_by(order.get(ordering, 'id'))
+                                          .order_by(order.get(ordering, 'id'))
 
         if category == 'liked':
             cafes = avg_ranking.filter(cafelike__user_id=user_id)
