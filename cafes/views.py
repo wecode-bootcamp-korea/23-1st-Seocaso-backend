@@ -138,35 +138,11 @@ class CafeInformationView(View):
             J = Count('starrating', filter=Q(starrating__score=5.0)),
         ).get(id=cafe_id)
 
-        cafe_ids = Cafe.objects.annotate(avg_score=Avg('starrating__score')).values_list('id', flat=True).order_by('-avg_score')
+        cafe_rating = Cafe.objects.annotate(avg_score=Avg('starrating__score')).filter(avg_score__gt=0).values_list('id', flat=True).order_by('-avg_score')
+        cafe_ranking = list(cafe_rating).index(cafe_id) + 1 if cafe_id in cafe_rating else None
 
-        cafe_ranking = list(cafe_ids).index(cafe_id) + 1
-
-        reviews              = Review.objects.filter(
-            cafe_id = cafe_id, comment_on_review_id__isnull = True
-        )
-        gallery_image_urls = CafeImage.objects.filter(cafe_id=cafe_id)
-        star_ratings = StarRating.objects.filter(cafe_id=cafe_id)
-        
-        if star_ratings.exists():
-            star_rating_value = StarRating.objects.values('cafe_id', 'score')            
-            cafe_avg_rating = star_rating_value.values('cafe_id').annotate(avg_score=Avg('score'))
-            cafe_ranking = cafe_avg_rating.order_by('-avg_score')
-            cafe_ranking_number = [x['cafe_id'] for x in list(cafe_ranking)].index(cafe_id) + 1
-        else:
-            cafe_ranking_number = None
-        
-        if reviews.exists():
-            review_count = reviews.values('cafe_id').annotate(cnt=Count('id'))
-            review_ranking_number = [x['cafe_id'] for x in list(review_count)].index(cafe_id) + 1
-        else:
-            review_ranking_number = None
-
-        gallery_image_list = [{
-                'index' : gallery_image_url.id, 
-                'img' : gallery_image_url.image_url
-            } for gallery_image_url in gallery_image_urls
-        ]
+        cafe_review = Cafe.objects.annotate(cnt=Count('review__id')).filter(cnt__gt=0).values_list('id', flat=True).order_by('-cnt')
+        review_ranking = list(cafe_review).index(cafe_id) + 1 if cafe_id in cafe_review else None
 
         informations = {
             'id'                 : cafe_id,
@@ -175,8 +151,8 @@ class CafeInformationView(View):
             'address'            : cafe.address,
             'phone_number'       : cafe.phone_number,
             'description'        : cafe.description,
-            'star_rating_ranking': cafe_ranking_number,
-            'review_ranking'     : review_ranking_number,
+            'star_rating_ranking': cafe_ranking,
+            'review_ranking'     : review_ranking,
             'likes'              : CafeLike.objects.filter(cafe_id=cafe_id).count(),
             'cafe_image_url'     : cafe.main_image_url,
             'background_image'   : gallery_image_list[0], 
