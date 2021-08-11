@@ -51,8 +51,6 @@ class UserCafeListView(View):
 
         return JsonResponse({'CAFE_LIST' : results}, status=200)
 
-
-
 class CafeListView(View):
     def get(self, request):
         ordering = request.GET.get('ordering', None)
