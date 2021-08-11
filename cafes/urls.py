@@ -8,5 +8,5 @@ urlpatterns = [
     path('/<int:review_id>/comment', CommentOnReviewView.as_view()),
     path('', CafeListView.as_view()),
     path('/<int:cafe_id>/menus', MenuView.as_view()),
-    path('/<int:cafe_id>/reviews', MenuView.as_view())
+    path('/<int:cafe_id>/reviews', StarRatingView.as_view())
 ]
