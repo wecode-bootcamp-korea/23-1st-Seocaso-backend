@@ -137,28 +137,4 @@ class RecommendationView(View):
             'avg_rating': avg_rating.get(id=cafe.id).avg
         } for cafe in recommended_cafes ]
 
-        # for recommended_cafe in recommended_cafes:
-
-        #     average_score = StarRating.objects.filter(
-        #         cafe_id=recommended_cafe.id
-        #         ).aggregate(average = Avg('score'))['average']
-
-        #     if average_score != None:
-        #         recommendation.append({
-        #             'cafe_id'            : recommended_cafe.id,
-        #             'cafe_name'          : recommended_cafe.name,
-        #             'average_star_rating': '{:.1f}'.format(average_score),
-        #             'url'                : recommended_cafe.main_image_url
-        #         })
-
-        #     else:
-        #         recommendation.append({
-        #             'cafe_id'            : recommended_cafe.id,
-        #             'cafe_name'          : recommended_cafe.name,
-        #             'average_star_rating': '0',
-        #             'url'                : recommended_cafe.main_image_url
-        #         })
-
-
-
         return JsonResponse({'recommendation':recommendation}, status=200)
