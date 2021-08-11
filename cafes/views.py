@@ -6,7 +6,7 @@ from django.views         import View
 from django.db.models     import Count, Avg
 
 from reviews.models import Review
-from cafes.models   import Cafe
+from cafes.models   import Cafe, Menu
 from utils          import log_in_confirm
 from ratings.models import StarRating
 
@@ -90,3 +90,16 @@ class CommentOnReviewView(View):
     )
 
         return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
+
+class MenuView(View):
+    def get(self, request, cafe_id):
+        menus = Menu.objects.filter(cafe_id=cafe_id)
+        
+        menu_list = [{
+                'id'       : menu.id,
+                'url'      : menu.image_url,
+                'menu_name': menu.name,
+                'price'    : '{:.0f}원'.format(menu.price)
+            } for menu in menus
+        ]
+        return JsonResponse({'menus':menu_list}, status=200)
