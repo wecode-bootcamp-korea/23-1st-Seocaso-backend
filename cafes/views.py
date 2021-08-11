@@ -3,10 +3,10 @@ from json.decoder import JSONDecodeError
 
 from django.http.response import JsonResponse
 from django.views         import View
-from django.db.models     import Count, Avg, F
+from django.db.models     import Count, Avg
 
 from reviews.models import Review
-from cafes.models   import Cafe
+from cafes.models   import Cafe, Menu
 from ratings.models import StarRating
 from utils          import log_in_confirm
 
