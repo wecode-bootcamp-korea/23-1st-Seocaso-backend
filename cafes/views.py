@@ -121,34 +121,44 @@ class MenuView(View):
         
 class RecommendationView(View):
     def get(self, request, cafe_id):
+        if not Cafe.objects.filter(id=cafe_id).exists():
+            return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'}, status=400)
 
-        cafe = Cafe.objects.get(id=cafe_id)
-        
+        city              = Cafe.objects.get(id=cafe_id).address.split()[1]
+        avg_rating        = Cafe.objects.all().annotate(avg=Avg('starrating__score'))
+        recommended_cafes = avg_rating.filter(address__icontains=city).exclude(id=cafe_id)
+
         recommendation = []
 
-        recommended_cafes = Cafe.objects.filter(address__icontains=cafe.address[:5]
-        ).exclude(id=cafe_id)[:6] 
+        recommendation = [{
+            'id'        : cafe.id,
+            'name'      : cafe.name,
+            'image'     : cafe.main_image_url,
+            'avg_rating': avg_rating.get(id=cafe.id).avg
+        } for cafe in recommended_cafes ]
 
-        for recommended_cafe in recommended_cafes:
+        # for recommended_cafe in recommended_cafes:
 
-            average_score = StarRating.objects.filter(
-                cafe_id=recommended_cafe.id
-                ).aggregate(average = Avg('score'))['average']
+        #     average_score = StarRating.objects.filter(
+        #         cafe_id=recommended_cafe.id
+        #         ).aggregate(average = Avg('score'))['average']
 
-            if average_score != None:
-                recommendation.append({
-                    'cafe_id'            : recommended_cafe.id,
-                    'cafe_name'          : recommended_cafe.name,
-                    'average_star_rating': '{:.1f}'.format(average_score),
-                    'url'                : recommended_cafe.main_image_url
-                }   
-                )
-            else:
-                recommendation.append({
-                    'cafe_id'            : recommended_cafe.id,
-                    'cafe_name'          : recommended_cafe.name,
-                    'average_star_rating': '0',
-                    'url'                : recommended_cafe.main_image_url
-                }   
-                )
+        #     if average_score != None:
+        #         recommendation.append({
+        #             'cafe_id'            : recommended_cafe.id,
+        #             'cafe_name'          : recommended_cafe.name,
+        #             'average_star_rating': '{:.1f}'.format(average_score),
+        #             'url'                : recommended_cafe.main_image_url
+        #         })
+
+        #     else:
+        #         recommendation.append({
+        #             'cafe_id'            : recommended_cafe.id,
+        #             'cafe_name'          : recommended_cafe.name,
+        #             'average_star_rating': '0',
+        #             'url'                : recommended_cafe.main_image_url
+        #         })
+
+
+
         return JsonResponse({'recommendation':recommendation}, status=200)
