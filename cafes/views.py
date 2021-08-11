@@ -153,17 +153,11 @@ class StarRatingView(View):
 
     def get(self, request, cafe_id):
 
-        star_ratings = StarRating.objects.values('cafe_id').annotate(cnt=Count('score'), avg=Avg('score')).filter(cafe_id=cafe_id)
+        star_rating = StarRating.objects.values('cafe_id').annotate(cnt=Count('score'), avg=Avg('score')).filter(cafe_id=cafe_id)
 
-        if star_ratings.exists():
-            results = {
-                        'total_count': star_ratings['cnt'],
-                        'average'   : '{:.1f}'.format(star_ratings['avg'])
-                    }
-        else:
-            results = {
-                        'total_count': '0',
-                        'average'   : '0'
-                    }
+        results = {
+            'total_count' : star_rating[0]['cnt'] if star_rating.exists() else 0,
+            'average'   : '{:.1f}'.format(star_rating[0]['avg']) if star_rating.exists() else 0
+        }
 
         return JsonResponse({'result':results}, status=200)
