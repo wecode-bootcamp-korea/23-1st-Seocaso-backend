@@ -7,8 +7,8 @@ from django.db.models     import Count, Avg
 
 from reviews.models import Review
 from cafes.models   import Cafe, Menu
-from utils          import log_in_confirm
 from ratings.models import StarRating
+from utils          import log_in_confirm
 
 class CafeListView(View):
     def get(self, request):
@@ -67,6 +67,21 @@ class ReviewView(View):
 
         review.delete()
         return JsonResponse({'MESSAGE' : 'REVIEW_DELETED'}, status=204)
+
+    def get(self, request, cafe_id):
+        reviews = Review.objects.filter(cafe_id=cafe_id).annotate(like_count=Count('reviewlike')).order_by('-like_count')
+
+        review_list = [{   
+                'id'                : review.user_id,
+                'nickname'          : review.user.nickname,
+                'profile_image'     : review.user.image_url,
+                'star_rating'       : review.user.starrating_set.get(cafe_id=cafe_id).score,
+                'content'           : review.content,
+                'review_like'       : review.like_count,
+                'comment_on_review' : review.comment_on_review.count() if review.comment_on_review else 0
+                } for review in reviews
+            ]
+        return JsonResponse({'reviews':review_list}, status=200)
 
 class RatingCountView(View):
     def get(self, request):
