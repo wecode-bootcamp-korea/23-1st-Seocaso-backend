@@ -1,6 +1,6 @@
 from django.urls import path
 
-from cafes.views import CafeView, ReviewView, RatingCountView, CommentOnReviewView,CafeListView, MenuView
+from cafes.views import CafeView, ReviewView, RatingCountView, CommentOnReviewView, CafeListView, MenuView
 
 urlpatterns = [
     path('/<int:cafe_id>/review', ReviewView.as_view()),
