@@ -118,7 +118,7 @@ class MenuView(View):
             } for menu in menus
         ]
         return JsonResponse({'menus':menu_list}, status=200)
-        
+
 class StarRatingView(View):
     @log_in_confirm
     def post(self, request, cafe_id):
@@ -153,13 +153,12 @@ class StarRatingView(View):
 
     def get(self, request, cafe_id):
 
-        star_ratings = StarRating.objects.filter(cafe_id=cafe_id)
+        star_ratings = StarRating.objects.values('cafe_id').annotate(cnt=Count('score'), avg=Avg('score')).filter(cafe_id=cafe_id)
 
         if star_ratings.exists():
             results = {
-                        'total_count': star_ratings.values('score').aggregate(cnt=Count('score'))['cnt'],
-                        'average'   : '{:.1f}'.format(star_ratings.aggregate(
-                            average = Avg('score'))['average']),
+                        'total_count': star_ratings['cnt'],
+                        'average'   : '{:.1f}'.format(star_ratings['avg'])
                     }
         else:
             results = {
