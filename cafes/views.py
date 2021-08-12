@@ -19,35 +19,30 @@ class UserCafeListView(View):
         ordering = request.GET.get('ordering', None)
         category = request.GET.get('category', None)
 
-        order    = {
+        filter_set    = {
             'high_rating': '-avg_rating',
             'low_rating' : 'avg_rating'
         }
 
-        avg_ranking   = Cafe.objects.all().annotate(avg_rating=Avg('starrating__score'))\
-                                          .order_by(order.get(ordering, 'id'))
+        q = Q()
+
+        cafes   = Cafe.objects.annotate(avg_rating=Avg('starrating__score')).order_by(filter_set.get(ordering, 'id'))
 
         if category == 'liked':
-            cafes = avg_ranking.filter(cafelike__user_id=user_id)
-
-            results = [ {
-                    'id'        : cafe.id,
-                    'name'      : cafe.name,
-                    'image'     : cafe.main_image_url,
-                    'address'   : cafe.address,
-                    'avg_rating': '%.1f' % cafe.avg_rating
-                } for cafe in cafes ]
+            q.add(Q(cafelike__user_id=user_id), Q.OR)
+            user_cafes = cafes.filter(q)
 
         if category == 'rated':
-            cafes = avg_ranking.filter(starrating__user_id=user_id)
-
-            results = [ {
+            q.add(Q(starrating__user_id=user_id), Q.OR)
+            user_cafes = cafes.filter(q)
+        
+        results = [ {
                     'id'         : cafe.id,
                     'name'       : cafe.name,
                     'image'      : cafe.main_image_url,
                     'address'    : cafe.address,
-                    'user_rating': Cafe.objects.get(id=cafe.id).starrating_set.get(user_id=user_id).score
-                } for cafe in cafes ]
+                    'avg_rating' : '%.1f' % cafe.avg_rating
+                } for cafe in user_cafes ]
 
         return JsonResponse({'CAFE_LIST' : results}, status=200)
 
