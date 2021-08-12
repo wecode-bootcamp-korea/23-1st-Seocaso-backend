@@ -128,13 +128,11 @@ class RecommendationView(View):
         avg_rating        = Cafe.objects.all().annotate(avg=Avg('starrating__score'))
         recommended_cafes = avg_rating.filter(address__icontains=city).exclude(id=cafe_id)
 
-        recommendation = []
-
         recommendation = [{
             'id'        : cafe.id,
             'name'      : cafe.name,
             'image'     : cafe.main_image_url,
-            'avg_rating': avg_rating.get(id=cafe.id).avg
+            'avg_rating': '%.1f' % avg_rating.get(id=cafe.id).avg
         } for cafe in recommended_cafes ]
 
         return JsonResponse({'recommendation':recommendation}, status=200)
