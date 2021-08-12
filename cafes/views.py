@@ -241,3 +241,33 @@ class CafeView(View):
             'evaluation_graphs'  : [cafe.A, cafe.B, cafe.C, cafe.D, cafe.E, cafe.F, cafe.G, cafe.H, cafe.I, cafe.J]                              
         }
         return JsonResponse({'informations':informations}, status=200)
+
+class SearchView(View):
+    def get(self, request):
+        search_keyword = request.GET.get('q', '')
+
+        cafe_results = Cafe.objects.filter(name__icontains=search_keyword)[:14]
+        address_results = Cafe.objects.filter(address__icontains=search_keyword)[:14]
+
+        if search_keyword:
+            
+            cafe_name_results = [{
+                'id'     : cafe_result.id,
+                'image'  : cafe_result.main_image_url,
+                'name'   : cafe_result.name,
+                'address': cafe_result.address
+            }for cafe_result in cafe_results
+            ]
+
+            address_search_results = [{
+                'id'     : address_result.id,
+                'image'  : address_result.main_image_url,
+                'name'   : address_result.name,
+                'address': address_result.address
+            } for address_result in address_results
+            ]
+
+        return JsonResponse({
+            'cafe_name_results'     : cafe_name_results,
+            'address_search_results': address_search_results
+            }, status=200)

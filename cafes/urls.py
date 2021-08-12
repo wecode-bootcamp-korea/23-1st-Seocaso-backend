@@ -1,6 +1,6 @@
 from django.urls import path
 
-from cafes.views import CafeView, ReviewView, RatingCountView, CommentOnReviewView, CafeListView, MenuView, StarRatingView, UserCafeListView
+from cafes.views import CafeView, ReviewView, RatingCountView, CommentOnReviewView, CafeListView, MenuView, StarRatingView, UserCafeListView, SearchView
 
 urlpatterns = [
     path('/<int:cafe_id>/review', ReviewView.as_view()),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('/user/<int:user_id>', UserCafeListView.as_view()),
     path('/<int:cafe_id>/star-rating', StarRatingView.as_view()), 
     path('/<int:cafe_id>', CafeView.as_view()),
+    path('/search', SearchView.as_view()),
 ]
