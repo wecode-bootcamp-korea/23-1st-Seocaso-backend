@@ -9,6 +9,42 @@ from reviews.models import Review
 from cafes.models   import Cafe, Menu
 from ratings.models import StarRating
 from utils          import log_in_confirm
+from users.models   import User
+
+class UserCafeListView(View):
+    def get(self, request, user_id):
+        if not User.objects.filter(id=user_id).exists():
+            return JsonResponse({'MESSAGE' : 'USER_DOES_NOT_EXIST'}, status=400)
+
+        ordering = request.GET.get('ordering', None)
+        category = request.GET.get('category', None)
+
+        filter_set    = {
+            'high_rating': '-avg_rating',
+            'low_rating' : 'avg_rating'
+        }
+
+        q = Q()
+
+        cafes   = Cafe.objects.annotate(avg_rating=Avg('starrating__score')).order_by(filter_set.get(ordering, 'id'))
+
+        if category == 'liked':
+            q.add(Q(cafelike__user_id=user_id), Q.OR)
+            user_cafes = cafes.filter(q)
+
+        if category == 'rated':
+            q.add(Q(starrating__user_id=user_id), Q.OR)
+            user_cafes = cafes.filter(q)
+        
+        results = [ {
+                    'id'         : cafe.id,
+                    'name'       : cafe.name,
+                    'image'      : cafe.main_image_url,
+                    'address'    : cafe.address,
+                    'avg_rating' : '%.1f' % cafe.avg_rating
+                } for cafe in user_cafes ]
+
+        return JsonResponse({'CAFE_LIST' : results}, status=200)
 
 class CafeListView(View):
     def get(self, request):
