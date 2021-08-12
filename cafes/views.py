@@ -154,6 +154,24 @@ class MenuView(View):
             } for menu in menus
         ]
         return JsonResponse({'menus':menu_list}, status=200)
+        
+class RecommendationView(View):
+    def get(self, request, cafe_id):
+        if not Cafe.objects.filter(id=cafe_id).exists():
+            return JsonResponse({'MESSAGE' : 'CAFE_DOES_NOT_EXIST'}, status=400)
+
+        city              = Cafe.objects.get(id=cafe_id).address.split()[1]
+        avg_rating        = Cafe.objects.all().annotate(avg=Avg('starrating__score'))
+        recommended_cafes = avg_rating.filter(address__icontains=city).exclude(id=cafe_id)
+
+        recommendation = [{
+            'id'        : cafe.id,
+            'name'      : cafe.name,
+            'image'     : cafe.main_image_url,
+            'avg_rating': '%.1f' % avg_rating.get(id=cafe.id).avg
+        } for cafe in recommended_cafes ]
+
+        return JsonResponse({'recommendation':recommendation}, status=200)
 
 class StarRatingView(View):
     @log_in_confirm
