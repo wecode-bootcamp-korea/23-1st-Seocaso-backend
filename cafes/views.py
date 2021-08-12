@@ -59,7 +59,7 @@ class ReviewView(View):
         except JSONDecodeError:
             return JsonResponse({'MESSAGE' : 'JSON_DECODE_ERROR'}, status=400)
 
-    #@log_in_confirm
+    @log_in_confirm
     def delete(self, request, cafe_id):
         review = Review.objects.filter(cafe_id=cafe_id, user_id=request.user.id)
         if not review.exists():
