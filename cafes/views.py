@@ -119,7 +119,49 @@ class MenuView(View):
         ]
         return JsonResponse({'menus':menu_list}, status=200)
 
-<<<<<<< HEAD
+class StarRatingView(View):
+    @log_in_confirm
+    def post(self, request, cafe_id):
+        try:
+            data = json.loads(request.body)
+
+            user = request.user
+
+            if not Cafe.objects.filter(id=cafe_id).exists():
+                return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=401)
+
+            star, flag = StarRating.objects.get_or_create(cafe_id=cafe_id, user_id=user.id)
+
+            if not flag:
+                if star.score == data['score']:
+                    star.delete()
+                    return JsonResponse({'MESSAGE' : 'SCORE_DELETED'}, status=200)
+
+                else:
+                    star.score = data['score']
+                    star.save()
+                    return JsonResponse({'MESSAGE' : 'SCORE_UPDATED'}, status=200)
+            else:
+                StarRating.objects.filter(cafe_id=cafe_id, user_id=user.id).update(score=data['score'])
+                return JsonResponse({'MESSAGE' : 'SCORE_CREATED'}, status=200)
+
+        except KeyError:
+            return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
+
+        except JSONDecodeError:
+            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status=400)
+
+    def get(self, request, cafe_id):
+
+        star_rating = StarRating.objects.values('cafe_id').annotate(cnt=Count('score'), avg=Avg('score')).filter(cafe_id=cafe_id)
+
+        results = {
+            'total_count' : star_rating[0]['cnt'] if star_rating.exists() else 0,
+            'average'   : '{:.1f}'.format(star_rating[0]['avg']) if star_rating.exists() else 0
+        }
+
+        return JsonResponse({'result':results}, status=200)
+
 class CafeView(View):
     def get(self, request, cafe_id):
         if not Cafe.objects.filter(id=cafe_id).exists():
@@ -163,47 +205,3 @@ class CafeView(View):
             'evaluation_graphs'  : [cafe.A, cafe.B, cafe.C, cafe.D, cafe.E, cafe.F, cafe.G, cafe.H, cafe.I, cafe.J]                              
         }
         return JsonResponse({'informations':informations}, status=200)
-=======
-class StarRatingView(View):
-    @log_in_confirm
-    def post(self, request, cafe_id):
-        try:
-            data = json.loads(request.body)
-
-            user = request.user
-
-            if not Cafe.objects.filter(id=cafe_id).exists():
-                return JsonResponse({'MESSAGE':'CAFE_DOES_NOT_EXIST'}, status=401)
-
-            star, flag = StarRating.objects.get_or_create(cafe_id=cafe_id, user_id=user.id)
-
-            if not flag:
-                if star.score == data['score']:
-                    star.delete()
-                    return JsonResponse({'MESSAGE' : 'SCORE_DELETED'}, status=200)
-
-                else:
-                    star.score = data['score']
-                    star.save()
-                    return JsonResponse({'MESSAGE' : 'SCORE_UPDATED'}, status=200)
-            else:
-                StarRating.objects.filter(cafe_id=cafe_id, user_id=user.id).update(score=data['score'])
-                return JsonResponse({'MESSAGE' : 'SCORE_CREATED'}, status=200)
-
-        except KeyError:
-            return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
-
-        except JSONDecodeError:
-            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status=400)
-
-    def get(self, request, cafe_id):
-
-        star_rating = StarRating.objects.values('cafe_id').annotate(cnt=Count('score'), avg=Avg('score')).filter(cafe_id=cafe_id)
-
-        results = {
-            'total_count' : star_rating[0]['cnt'] if star_rating.exists() else 0,
-            'average'   : '{:.1f}'.format(star_rating[0]['avg']) if star_rating.exists() else 0
-        }
-
-        return JsonResponse({'result':results}, status=200)
->>>>>>> c8bfbbb75d5f6471a90eb9ef374a065e5bf07dba
