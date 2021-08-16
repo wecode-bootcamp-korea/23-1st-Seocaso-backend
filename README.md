@@ -4,14 +4,14 @@
 
 ## 개발 인원 및 기간
 - 개발 기간 : 2021/08/02 - 2021/08/13
-- 프론트엔드 : 김다슬, 문주영, 소진수
-- 백엔드 : 장호준, 최혜림
-- [프론트엔드 github 링크]()
+- 프론트엔드 : [김다슬](https://github.com/cocacollllla/), [문주영](https://github.com/moonjuyoung1), [소진수](https://github.com/joshhhso)
+- 백엔드 : [장호준](https://github.com/bigfanoftim), [최혜림](https://github.com/rimi0108)
+- [프론트엔드 github 링크](https://github.com/wecode-bootcamp-korea/23-1st-Seocaso-frontend)
 
 ## 프로젝트 선정 이유
 - 평소에 본인이 자주 사용하는 사이트이며, 현재 저희의 수준에서 배운 기술들을 적용하기에 난이도가 적합하다고 판단했습니다.
 
-## 데모 영상 (이미지 클릭)
+## [데모 영상](https://youtu.be/V38oqwMjnoI)
 
 ## 적용 기술 및 구현 기능
 ### 적용 기술
